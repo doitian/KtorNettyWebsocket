@@ -12,21 +12,24 @@ import org.jetbrains.ktor.routing.routing
 import org.jetbrains.ktor.websocket.WebSockets
 import org.jetbrains.ktor.websocket.webSocket
 import java.time.Duration
+import java.util.concurrent.atomic.AtomicInteger
 
 fun main(args:Array<String>) {
+    val nextId = AtomicInteger(0)
     val server = embeddedServer(Jetty, 3001) {
         install(WebSockets) {
             pingPeriod = Duration.ofMinutes(1)
         }
         routing {
             webSocket("/ws") {
-                println("connected")
+                val id = nextId.incrementAndGet()
+                println("connected " + id)
                 try {
                     incoming.consumeEach { frame ->
                         println(frame)
                     }
                 } finally {
-                    println("closed")
+                    println("closed " + id)
                 }
             }
 
